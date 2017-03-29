@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="chef-cloudflare-ips" default="build" basedir=".">
+    <property environment="env" />
+
+    <patternset id="ruby_files">
+        <include name="**/*.rb" />
+        <include name="**/Berksfile" />
+        <include name="**/Gemfile" />
+        <include name="**/Guardfile" />
+        <include name="**/Rakefile" />
+        <include name="**/Vagrantfile" />
+        <exclude name="**/.kitchen/**/Vagrantfile" />
+    </patternset>
+
+    <fileset id="ruby" dir="${basedir}">
+        <patternset refid="ruby_files" />
+    </fileset>
+
+    <patternset id="erb_files">
+        <include name="**/*.erb" />
+        <exclude name="vendor/" />
+    </patternset>
+
+    <fileset id="erb" dir="${basedir}">
+        <patternset refid="erb_files" />
+    </fileset>
+
+    <target name="clean" description="Clean up and create artifact directories">
+        <delete dir="${basedir}/build/logs" />
+        <delete dir="${basedir}/build/rspec" />
+
+        <mkdir dir="${basedir}/build/logs" />
+        <mkdir dir="${basedir}/build/rspec" />
+    </target>
+
+    <target name="bundler" description="Ensure gem dependencies are up to date">
+        <exec executable="gem" failonerror="true" taskname="bundler gem">
+            <arg value="install" />
+            <arg value="bundler" />
+        </exec>
+
+        <exec executable="bundle" failonerror="true" taskname="bundle install">
+            <arg value="install" />
+        </exec>
+
+        <delete dir="${basedir}/.bundle/" />
+    </target>
+
+    <target name="rspec" description="Run rspec for a given directory and generate junit output">
+        <echo message="Running rspec for directory '${basedir}'" />
+        <exec executable="chef" dir="${basedir}" failonerror="true" taskname="rspec">
+            <arg value="exec" />
+            <arg value="rspec" />
+            <arg value="--color" />
+            <arg value="--format=documentation" />
+            <arg value="--format=RspecJunitFormatter" />
+            <arg value="--out=${basedir}/build/rspec/junit.xml" />
+            <arg value="--profile" />
+        </exec>
+    </target>
+
+    <target name="kitchen" description="Run test-kitchen for a given directory">
+        <echo message="Running test-kitchen for directory '${basedir}'" />
+        <exec executable="bundle" dir="${basedir}" failonerror="true" taskname="kitchen">
+            <arg value="exec" />
+            <arg value="kitchen" />
+            <arg value="test" />
+        </exec>
+        <exec executable="bundle" dir="${basedir}" taskname="kitchen destroy">
+            <arg value="exec" />
+            <arg value="kitchen" />
+            <arg value="destroy" />
+        </exec>
+    </target>
+
+    <target name="lint" description="Perform syntax check of sourcecode files">
+        <apply executable="ruby" failonerror="true" parallel="true" skipemptyfilesets="true">
+            <arg value="-w" />
+            <arg value="-c" />
+
+            <fileset refid="ruby" />
+        </apply>
+
+        <apply executable="bundle" failonerror="true" parallel="true" skipemptyfilesets="true">
+            <arg value="exec" />
+            <arg value="rails-erb-lint" />
+            <arg value="check" />
+            <arg value="-v" />
+
+            <fileset refid="erb" />
+        </apply>
+    </target>
+
+    <target name="rubocop" description="Perform rubocop style checking of ruby files">
+        <apply executable="bundle" failonerror="true" parallel="true" skipemptyfilesets="true">
+            <arg value="exec" />
+            <arg value="rubocop" />
+
+            <fileset refid="ruby" />
+        </apply>
+    </target>
+
+    <target name="foodcritic" description="Perform foodcritic checks of cookbooks">
+        <exec executable="bundle" dir="${basedir}" failonerror="true" taskname="foodcritic">
+            <arg value="exec" />
+            <arg value="foodcritic" />
+            <arg value="-C" />
+            <arg value="-f ~FC015" />
+            <arg value="${basedir}" />
+        </exec>
+    </target>
+
+    <target name="berkshelf" description="Run berkshelf to ensure dependencies can be resolved">
+        <exec executable="bundle" dir="${basedir}" failonerror="true" taskname="berkshelf">
+            <arg value="exec" />
+            <arg value="berks" />
+            <arg value="install" />
+        </exec>
+    </target>
+
+    <target name="build" depends="clean,bundler,lint,foodcritic,rubocop,berkshelf,rspec" />
+</project>
