@@ -1,11 +1,14 @@
 # cloudflare-ips
-=======
-Install http_realip.conf for NGINX
-Installs a BASH script to fetch the update IPs from CloudFlare and install them
-into a http_realip.conf
-Installs a cronjob that periodically runs the BASH script
+To be used in conjunction with HTTP_AUTH for Nginx when CloudFlare CDN Proxy is
+enabled and you need to match the http_auth whitelist against the real IP of the
+connecting client that would be otherwise masked by CF's proxy servers IP
 
-## USAGE
+* Install http_realip.conf for NGINX
+* Installs a BASH script to fetch the update IPs from CloudFlare and install them
+into a http_realip.conf
+* Installs a cronjob that periodically runs the BASH script
+
+## Usage
 Example:
 ```
 "default_attributes": {
