@@ -23,6 +23,6 @@ Example:
    },
    "run_list": [
      ...
-     "recipe[cloudflare-ips]"
+     "recipe[cloudflare-ips::nginx-realip]"
   ]
 ```
