@@ -12,22 +12,16 @@ into a http_realip_cloudflare_ips.conf
 
 Need to create a separate http_realip.conf file for Nginx where to add the
 `real_ip_header` statement, and where you may maintain an independent list of `set_real_ip_from`
+This is usually done using the recipe:
+```
+  "recipe[config-driven-helper::nginx-http-realip]",
+```
 
 IPv6 addresses are supported starting from versions 1.3.0 and 1.2.1 (Nginx version)
 
 
 ## Example of use
 ```
-"default_attributes": {
-  "nginx": {
-    "shared_config": {
-      "load-balancer": {
-           ...
-           "includes": ["http_realip_cloudflare_ips.conf"]
-         }
-       }
-     }
-   },
    "run_list": [
      ...
      "recipe[cloudflare-ips::nginx-realip]"
