@@ -3,7 +3,6 @@ cookbook_file "#{node['nginx']['dir']}/http_realip.conf" do
   owner  'root'
   group  'root'
   mode   '0644'
-  notifies :reload, 'service[nginx]'
 end
 
 cookbook_file "/usr/local/bin/http_realip_cloudflare" do
@@ -18,4 +17,8 @@ cron_d 'http_realip_cloudflare' do
   hour    8
   command "/usr/local/bin/http_realip_cloudflare #{node['nginx']['dir']}/http_realip.conf > /dev/null 2>&1"
   user    'root'
+end
+
+execute "first run of http_realip_cloudflare" do
+  command "/usr/local/bin/http_realip_cloudflare #{node['nginx']['dir']}/http_realip.conf"
 end

@@ -1,4 +1,4 @@
-name              "cloudflare_ips"
+name              "cloudflare-ips"
 maintainer        "Marco Massari Calderone"
 maintainer_email  "mmassari@inviqa.com"
 license           'MIT'

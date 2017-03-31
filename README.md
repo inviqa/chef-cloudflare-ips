@@ -8,8 +8,10 @@ connecting client that would be otherwise masked by CF's proxy servers IP
 into a http_realip.conf
 * Installs a cronjob that periodically runs the BASH script
 
-## Usage
-Example:
+## Requirements
+IPv6 addresses are supported starting from versions 1.3.0 and 1.2.1 (Nginx version)
+
+## Example of use
 ```
 "default_attributes": {
   "nginx": {
