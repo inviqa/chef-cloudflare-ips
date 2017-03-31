@@ -14,12 +14,8 @@ IP_LISTS=(
           "https://www.cloudflare.com/ips-v4"
           "https://www.cloudflare.com/ips-v6"
           )
-HTTP_REALIP_TEMP="/tmp/http_realip.tmp"
-REAL_IP_HEADER="real_ip_header X-Forwarded-For;"
+HTTP_REALIP_TEMP="/tmp/cloudflare-ips.tmp"
 INFO="# THIS FILE IS UPDATED BY $(dirname $0)/$0 RUN BY CRON"
-# use any of the following two
-# real_ip_header CF-Connecting-IP;
-# real_ip_header X-Forwarded-For;
 
 # reset the current http_realip conf file
 echo $INFO > $HTTP_REALIP_TEMP
@@ -29,8 +25,6 @@ for LIST in "${IP_LISTS[@]}"
 do
   eval "$CURL -s $LIST |sed -e 's/^/set_real_ip_from /;s/$/;/' >> $HTTP_REALIP_TEMP"
 done
-
-echo $REAL_IP_HEADER >> $HTTP_REALIP_TEMP
 
 # compares the newly generated file with the existing one.
 set +e

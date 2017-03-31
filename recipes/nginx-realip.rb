@@ -1,5 +1,5 @@
-cookbook_file "#{node['nginx']['dir']}/http_realip.conf" do
-  source 'nginx/http_realip.conf'
+cookbook_file "#{node['nginx']['dir']}/http_realip_cloudflare_ips.conf" do
+  source 'nginx/http_realip_cloudflare_ips.conf'
   owner  'root'
   group  'root'
   mode   '0644'
@@ -15,10 +15,10 @@ end
 cron_d 'http_realip_cloudflare' do
   minute  0
   hour    8
-  command "/usr/local/bin/http_realip_cloudflare #{node['nginx']['dir']}/http_realip.conf > /dev/null 2>&1"
+  command "/usr/local/bin/http_realip_cloudflare #{node['nginx']['dir']}/http_realip_cloudflare_ips.conf > /dev/null 2>&1"
   user    'root'
 end
 
 execute "first run of http_realip_cloudflare" do
-  command "/usr/local/bin/http_realip_cloudflare #{node['nginx']['dir']}/http_realip.conf"
+  command "/usr/local/bin/http_realip_cloudflare #{node['nginx']['dir']}/http_realip_cloudflare_ips.conf"
 end
